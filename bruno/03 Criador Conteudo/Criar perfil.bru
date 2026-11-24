@@ -1,0 +1,33 @@
+meta {
+  name: Criar perfil
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://influencer-marketplace-api.onrender.com/criador_conteudo
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "usuario_id": "{{usuarioId}}",
+    "avaliacao_criador": 4.8,
+    "especialidade_id": "{{especialidadeId}}"
+  }
+}
+
+script:post-response {
+  if (res.body?.id) bru.setVar("criadorId", res.body.id);
+}
+
+tests {
+  test("Criador criado", function () {
+    expect(res.status).to.equal(201);
+  });
+}

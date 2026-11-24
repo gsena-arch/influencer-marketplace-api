@@ -1,0 +1,34 @@
+meta {
+  name: Matricular Bruno
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://influencer-marketplace-api.onrender.com/matricula
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "usuario_id": "{{usuarioId}}",
+    "curso_id": "{{cursoId}}",
+    "data_matricula": "2026-11-24T12:00:00.000Z",
+    "status": "ativa"
+  }
+}
+
+script:post-response {
+  if (res.body?.id) bru.setVar("matriculaId", res.body.id);
+}
+
+tests {
+  test("Matrícula criada", function () {
+    expect(res.status).to.equal(201);
+  });
+}

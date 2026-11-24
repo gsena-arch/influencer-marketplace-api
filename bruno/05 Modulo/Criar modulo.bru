@@ -1,0 +1,33 @@
+meta {
+  name: Criar modulo
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://influencer-marketplace-api.onrender.com/modulo
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "curso_id": "{{cursoId}}",
+    "titulo": "Planejamento da campanha {{indice}}",
+    "descricao": "Definição de público, canais e objetivos"
+  }
+}
+
+script:post-response {
+  if (res.body?.id) bru.setVar("moduloId", res.body.id);
+}
+
+tests {
+  test("Módulo criado", function () {
+    expect(res.status).to.equal(201);
+  });
+}

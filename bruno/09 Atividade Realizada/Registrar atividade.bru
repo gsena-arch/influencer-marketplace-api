@@ -1,0 +1,35 @@
+meta {
+  name: Registrar atividade
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://influencer-marketplace-api.onrender.com/atividade_realizada
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "atividade_id": "{{atividadeId}}",
+    "matricula_id": "{{matriculaId}}",
+    "nota": 9.5,
+    "status": "concluída",
+    "data_realizacao": "2026-11-24T15:00:00.000Z"
+  }
+}
+
+script:post-response {
+  if (res.body?.id) bru.setVar("atividadeRealizadaId", res.body.id);
+}
+
+tests {
+  test("Atividade realizada registrada", function () {
+    expect(res.status).to.equal(201);
+  });
+}

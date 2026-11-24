@@ -1,0 +1,33 @@
+meta {
+  name: Criar especialidade
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://influencer-marketplace-api.onrender.com/especialidade_criador
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nome": "Marketing de influência {{indice}} - {{sufixo}}",
+    "descricao": "Criação de conteúdo e campanhas digitais"
+  }
+}
+
+script:post-response {
+  if (res.body?.id) bru.setVar("especialidadeId", res.body.id);
+}
+
+tests {
+  test("Especialidade criada", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.id).to.be.a("string");
+  });
+}
