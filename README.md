@@ -1,6 +1,9 @@
-# API de cursos
+# Influencer Marketplace API
 
 API REST para gerenciamento de uma plataforma de cursos. O sistema permite cadastrar e consultar usuários, criadores de conteúdo, especialidades, cursos, módulos, conteúdos, matrículas, atividades, atividades realizadas e checklists.
+
+- **API em produção:** [https://influencer-marketplace-api.onrender.com](https://influencer-marketplace-api.onrender.com)
+- **Swagger:** [https://influencer-marketplace-api.onrender.com/api-docs](https://influencer-marketplace-api.onrender.com/api-docs)
 
 ## Tecnologias
 
@@ -100,6 +103,9 @@ As relações entre as entidades são protegidas por chaves estrangeiras. Um reg
 ## Estrutura do projeto
 
 ```text
+.github/
+└── workflows/ci.yml        # Typecheck, testes, build e deploy no Render
+bruno/                      # Coleção de requisições e carga de dados
 db/
 └── migrations/             # Criação e atualização do banco de dados
 src/
@@ -134,9 +140,12 @@ Configure as variáveis:
 | Variável | Finalidade | Exemplo |
 | --- | --- | --- |
 | `DATABASE_URL` | URL de conexão com o PostgreSQL | `postgresql://postgres:senha@localhost:5432/api_db` |
-| `PORT` | Porta HTTP da API | `3000` |
+| `PORT` | Porta HTTP usada pela API | `3000` |
+| `NODE_ENV` | Ambiente de execução | `production` |
 
 O arquivo `.env` não deve ser versionado.
+
+Em produção, `DATABASE_URL` deve receber a Internal Database URL do PostgreSQL no Render. A variável `PORT` é fornecida automaticamente pelo serviço.
 
 ## Execução
 
@@ -158,7 +167,7 @@ Inicie em modo de desenvolvimento:
 npm run dev
 ```
 
-A API ficará disponível em `http://localhost:3000` e a documentação Swagger em `http://localhost:3000/api-docs`.
+No desenvolvimento local, a API ficará disponível em `http://localhost:3000`. A versão publicada está disponível em [https://influencer-marketplace-api.onrender.com](https://influencer-marketplace-api.onrender.com).
 
 Para executar a versão compilada:
 
@@ -185,6 +194,19 @@ npm run db:migrate
 ```
 
 Se o banco já possuir dados que contrariem uma regra de unicidade, a migration será cancelada. Os dados conflitantes precisam ser corrigidos antes de uma nova tentativa.
+
+## Deploy no Render
+
+A aplicação e o banco PostgreSQL são serviços separados no Render. Para a API, utilize:
+
+| Configuração | Valor |
+| --- | --- |
+| Build Command | `npm ci && npm run build` |
+| Start Command | `npm start` |
+| `DATABASE_URL` | Internal Database URL do PostgreSQL |
+| `NODE_ENV` | `production` |
+
+O workflow `.github/workflows/ci.yml` executa typecheck, migrations e testes em um PostgreSQL descartável, compila a aplicação e aciona o Deploy Hook do Render somente após todas as validações passarem na branch `main`.
 
 ## Endpoints
 
@@ -344,18 +366,35 @@ npm run test:integration
 
 Os testes de integração usam o PostgreSQL indicado em `DATABASE_URL`, criam registros temporários e removem somente os registros criados durante os testes.
 
+No GitHub Actions, os testes utilizam uma instância PostgreSQL isolada e nunca acessam o banco de produção do Render.
+
 Verifique os tipos TypeScript:
 
 ```powershell
 npm run typecheck
 ```
 
+## Coleção Bruno
+
+A pasta `bruno/` contém os POSTs organizados na ordem dos relacionamentos entre as entidades. Para criar dez registros de cada entidade, execute a coleção completa com o arquivo `bruno/data/10-registros.json` no Collection Runner.
+
+Os endpoints da coleção apontam para a API publicada no Render. Os IDs retornados são salvos como variáveis de runtime e usados automaticamente nas requisições seguintes.
+
+## CI/CD
+
+O workflow do GitHub Actions é executado em pushes para `main` ou `master`, pull requests e execuções manuais. Ele possui os seguintes jobs:
+
+1. `typecheck`: valida os tipos TypeScript;
+2. `test`: inicia PostgreSQL, aplica migrations e executa os testes;
+3. `build`: compila a aplicação após as validações;
+4. `deploy`: aciona o Render em pushes aprovados para `main`.
+
+O deploy utiliza o secret `RENDER_DEPLOY_HOOK_URL`, configurado em **Settings → Secrets and variables → Actions** no GitHub.
+
 ## Documentação Swagger
 
 Com a API em execução, acesse:
 
-```text
-http://localhost:3000/api-docs
-```
+[https://influencer-marketplace-api.onrender.com/api-docs](https://influencer-marketplace-api.onrender.com/api-docs)
 
 A rota `/` redireciona para essa documentação.
