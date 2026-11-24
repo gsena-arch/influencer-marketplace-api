@@ -1,0 +1,10 @@
+export { default as CursoController } from "./CursoController.js";
+export { default as ModuloController } from "./ModuloController.js";
+export { default as ConteudoController } from "./ConteudoController.js";
+export { default as UsuarioController } from "./UsuarioController.js";
+export { default as EspecialidadeCriadorController } from "./EspecialidadeCriadorController.js";
+export { default as CriadorConteudoController } from "./CriadorConteudoController.js";
+export { default as MatriculaController } from "./MatriculaController.js";
+export { default as AtividadeController } from "./AtividadeController.js";
+export { default as AtividadeRealizadaController } from "./AtividadeRealizadaController.js";
+export { default as CheckListController } from "./CheckListController.js";
