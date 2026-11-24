@@ -11,7 +11,6 @@ export interface AtividadeData {
     tipo?: string | null;
 }
 
-// PostgreSQL returns NUMERIC as string and TIMESTAMP as Date.
 export interface AtividadeRecord {
     id: string;
     modulo_id: string | null;
